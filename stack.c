@@ -9,7 +9,7 @@
  * 
  */
 #include "stack.h"
-
+const unsigned long long kanareika = 7956576;
 exceptions stack_verify(stack* stack);
 
 /**
@@ -25,7 +25,54 @@ stack* stack_init(){
     double *arr = (double*) calloc(sizeof(double), st->length + sizeof(unsigned long long));
     st->arr = arr;
     st->iter = 0;
+   // st->arr[st->length] = kanareika;
     return st;
+}
+
+/**
+ * @brief Get the Time object
+ * 
+ * @return char* 
+ */
+
+char* getTime(){
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    char string[64];
+    assert(strftime(string, sizeof(string), "%c", tm));
+    char* rez = strdup(string);
+    return rez;
+}
+
+void make_dump(stack* stack){
+    FILE *file = fopen("files/log.txt", "w");
+    //checking is the file opened
+    if (file == NULL) {
+        printf("File was not opened");
+        return;
+    }
+    // getting info about running prcecc
+    char *string = getTime();
+    // print info about stack
+    fprintf(file, "Information about stack ");
+    fprintf(file, "%s\n", string);
+    fprintf(file, "length = %d\n", stack->length); 
+    fprintf(file, "the current iterator = %d\n", stack->iter);
+    fprintf(file, "The memory of array = %p\n", stack->arr);
+    fprintf(file, "Elements of array:\n");
+    //printing elements of array
+    for (size_t i = 0; i < stack->length; i++)
+    {
+        fprintf(file, "arr[%i] = %lf\n", i, stack->arr[i]);
+    }
+    fprintf(file, "kanareika value = %d\n", kanareika);
+    free(string);
+    fclose(file);
+    return;
+}
+
+void make_log(stack* stack){
+    return;
 }
 
 /**
@@ -90,9 +137,11 @@ void push(stack* stack, double info){
     stack->arr[stack->iter] = info;
     stack->iter++;
     if(stack_verify(stack) == Out_of_range){
-        // code
+        // make dump
+        make_dump(stack);
         return;
     }
+    
     return;
 }
 
@@ -106,12 +155,17 @@ void push(stack* stack, double info){
 double pop(stack* stack){
     if (stack == NULL) {
         //printf("the stack ponter is NULL");
-        return;
+        return 0;
     }
     if (stack->iter <=stack->length/2) {
         resize_down(stack);
     }
     double tmp = stack->arr[stack->iter--];
+    if(stack_verify(stack) == Out_of_range){
+        // code
+        make_dump(stack);
+        return 0;
+    }
     return tmp;
 }
 
@@ -125,7 +179,7 @@ double pop(stack* stack){
 double top(stack* stack){
     if (stack == NULL) {
         //printf("the stack ponter is NULL");
-        return;
+        return 0;
     }
     return stack->arr[stack->iter-1];;
 }
@@ -156,7 +210,7 @@ void stack_destroy(stack* stack){
 exceptions stack_verify(stack* stack){
     if (stack == NULL) {
         //printf("the stack ponter is NULL");
-        return;
+        return Empty_stack;
     }
     if (stack->arr[stack->length] != kanareika)
     {

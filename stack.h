@@ -13,7 +13,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-const unsigned long long kanareika = 795657126918456;
+#include <time.h>
+#include <assert.h>
+#include <string.h>
+
 // stack
 typedef struct {
     double *arr;
@@ -37,4 +40,7 @@ void stack_destroy(stack* stack);
 void resize_down(stack* stack);
 double top(stack* stack);
 exceptions stack_verify(stack* stack);
+void make_log(stack* stack);
+char* getTime();
+void make_dump(stack* stack);
 #endif
