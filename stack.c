@@ -10,6 +10,8 @@
  */
 #include "stack.h"
 
+exceptions stack_verify(stack* stack);
+
 /**
  * @fn stack* stack_init()
  * @brief a function that creates a stack with a length of 10 elements
@@ -18,15 +20,11 @@
  */
 
 stack* stack_init(){
-    double *arr = (double*) calloc(sizeof(double), 10);
     stack *st = (stack*)calloc(sizeof(stack), 1);
-    st->arr = arr;
     st->length = 10;
-    // ставим указатель на первый элемент массива
+    double *arr = (double*) calloc(sizeof(double), st->length + sizeof(unsigned long long));
+    st->arr = arr;
     st->iter = 0;
-    st->kanareika = rand()*rand()*rand();
-    //??
-    st->arr[st->length-1] = st->kanareika;
     return st;
 }
 
@@ -38,12 +36,15 @@ stack* stack_init(){
  */
 
 void resize_up(stack* stack){
+    if (stack == NULL) {
+        //printf("the stack ponter is NULL");
+        return;
+    }
     stack->length = 2 * stack->length;
     double* new_arr = (double*) calloc(sizeof(double), stack->length);
     for (size_t i = 0; i < stack->length/2; i++) {
         new_arr[i] = stack->arr[i];
     }
-    new_arr[stack->length-1] = stack->kanareika;
     free(stack->arr);
     stack->arr = new_arr;
     return;
@@ -57,12 +58,16 @@ void resize_up(stack* stack){
  */
 
 void resize_down(stack* stack){
+    if (stack == NULL) {
+        //printf("the stack ponter is NULL");
+        return;
+    }
     stack->length = (stack->length)/2;
     double* new_arr = (double*) calloc(sizeof(double), stack->length);
     for (size_t i = 0; i < stack->length; i++) {
         new_arr[i] = stack->arr[i];
     }
-    stack->arr[stack->length-1] = stack->kanareika;
+    free(stack->arr);
     stack->arr = new_arr;
     return;
 }
@@ -75,12 +80,19 @@ void resize_down(stack* stack){
  */
 
 void push(stack* stack, double info){
-    //1 - kanareyra and 1 - iter
-    if(stack->iter >= stack->length-2) {
+    if (stack == NULL) {
+        //printf("the stack ponter is NULL");
+        return;
+    }
+    if(stack->iter >= stack->length-1) {
         resize_up(stack);
     }
     stack->arr[stack->iter] = info;
     stack->iter++;
+    if(stack_verify(stack) == Out_of_range){
+        // code
+        return;
+    }
     return;
 }
 
@@ -92,7 +104,11 @@ void push(stack* stack, double info){
  */
 
 double pop(stack* stack){
-    if (stack->iter <= (stack->length/2)-1) {
+    if (stack == NULL) {
+        //printf("the stack ponter is NULL");
+        return;
+    }
+    if (stack->iter <=stack->length/2) {
         resize_down(stack);
     }
     double tmp = stack->arr[stack->iter--];
@@ -107,6 +123,10 @@ double pop(stack* stack){
  */
 
 double top(stack* stack){
+    if (stack == NULL) {
+        //printf("the stack ponter is NULL");
+        return;
+    }
     return stack->arr[stack->iter-1];;
 }
 
@@ -118,7 +138,29 @@ double top(stack* stack){
  */
 
 void stack_destroy(stack* stack){
+    if (stack == NULL) {
+        //printf("the stack ponter is NULL");
+        return;
+    }
     free(stack->arr);
     free(stack);
     return;
+}
+
+/**
+ * @brief  
+ * 
+ * @param stack 
+ * @return exceptions 
+ */
+exceptions stack_verify(stack* stack){
+    if (stack == NULL) {
+        //printf("the stack ponter is NULL");
+        return;
+    }
+    if (stack->arr[stack->length] != kanareika)
+    {
+        return Out_of_range;
+    }
+    return Successfully;
 }

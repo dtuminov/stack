@@ -13,14 +13,21 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
+const unsigned long long kanareika = 795657126918456;
+// stack
 typedef struct {
     double *arr;
     size_t length;
     int iter;
     double hash;
-    long int kanareika;
 } stack;
+// error codes
+typedef enum{
+    Successfully = 0,
+    Out_of_range,
+    Empty_stack
+} exceptions;
+
 
 stack* stack_init();
 double pop(stack* stack);
@@ -29,5 +36,5 @@ void resize_up(stack* stack);
 void stack_destroy(stack* stack);
 void resize_down(stack* stack);
 double top(stack* stack);
-
+exceptions stack_verify(stack* stack);
 #endif
