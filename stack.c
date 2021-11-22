@@ -10,10 +10,10 @@
  */
 #include "stack.h"
 
-
 /**
- * @brief 
- * 
+ * @fn stack* stack_init()
+ * @brief a function that creates a stack with a length of 10 elements
+ * @details the function that creates a stack with a length of 10 elements initializes the default parameters
  * @return stack* 
  */
 
@@ -22,69 +22,80 @@ stack* stack_init(){
     stack *st = (stack*)calloc(sizeof(stack), 1);
     st->arr = arr;
     st->length = 10;
-    st->iter = 1;
+    // ставим указатель на первый элемент массива
+    st->iter = 0;
+    st->kanareika = rand()*rand()*rand();
+    //??
+    st->arr[st->length-1] = st->kanareika;
     return st;
 }
 
 /**
- * @brief 
- * 
- * @param stack 
+ * @fn void resize_up(stack* stack)
+ * @brief increases the length of the array
+ * @details doubles the length of the stack array
+ * @param stack the stack passed to the function
  */
 
-void resize(stack* stack){
+void resize_up(stack* stack){
     stack->length = 2 * stack->length;
     double* new_arr = (double*) calloc(sizeof(double), stack->length);
     for (size_t i = 0; i < stack->length/2; i++) {
         new_arr[i] = stack->arr[i];
     }
+    new_arr[stack->length-1] = stack->kanareika;
+    free(stack->arr);
     stack->arr = new_arr;
     return;
 }
 
 /**
- * @brief 
- * 
- * @param stack 
+ * @fn void resize_down(stack* stack)
+ * @brief void resize_down(stack* stack)
+ * @details the function reduces the length of the stack array by half
+ * @param stack the stack passed to the function
  */
 
-void shrink_to_fit(stack* stack){
+void resize_down(stack* stack){
     stack->length = (stack->length)/2;
     double* new_arr = (double*) calloc(sizeof(double), stack->length);
     for (size_t i = 0; i < stack->length; i++) {
         new_arr[i] = stack->arr[i];
     }
+    stack->arr[stack->length-1] = stack->kanareika;
     stack->arr = new_arr;
     return;
 }
 
 /**
- * @brief 
- * 
- * @param stack 
- * @param info 
+ * @fn void push(stack* stack, double info)
+ * @brief adds an element to the array
+ * @param stack the stack passed to the function
+ * @param info data that is being moved to the array
  */
 
 void push(stack* stack, double info){
+    //1 - kanareyra and 1 - iter
     if(stack->iter >= stack->length-2) {
-        resize(stack);
+        resize_up(stack);
     }
-    stack->arr[stack->iter-1] = info;
+    stack->arr[stack->iter] = info;
     stack->iter++;
     return;
 }
 
 /**
- * @brief 
- * 
+ * @fn double pop(stack* stack)
+ * @brief the function removes the last element of the stack
+ * @param stack the stack passed to the function
+ * @return the value that was deleted
  */
 
 double pop(stack* stack){
-    if (stack->iter-1 <= stack->length/2) {
-        shrink_to_fit(stack);
+    if (stack->iter <= (stack->length/2)-1) {
+        resize_down(stack);
     }
-    double tmp = stack->arr[stack->iter];
-    stack->iter--;
+    double tmp = stack->arr[stack->iter--];
     return tmp;
 }
 
@@ -92,6 +103,18 @@ double pop(stack* stack){
  * @brief 
  * 
  * @param stack 
+ * @return double 
+ */
+
+double top(stack* stack){
+    return stack->arr[stack->iter-1];;
+}
+
+/**
+ * @fn void stack_destroy(stack* stack)
+ * @brief the function cleans the stack passed to it
+ * 
+ * @param stack the stack passed to the function
  */
 
 void stack_destroy(stack* stack){

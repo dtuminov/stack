@@ -18,12 +18,16 @@ typedef struct {
     double *arr;
     size_t length;
     int iter;
+    double hash;
+    long int kanareika;
 } stack;
 
 stack* stack_init();
-double pop();
+double pop(stack* stack);
 void push(stack* stack, double info);
-void resize(stack* stack);
+void resize_up(stack* stack);
 void stack_destroy(stack* stack);
-void shrink_to_fit(stack* stack);
+void resize_down(stack* stack);
+double top(stack* stack);
+
 #endif
