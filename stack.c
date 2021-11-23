@@ -25,7 +25,8 @@ stack* stack_init(){
     double *arr = (double*) calloc(sizeof(double), st->length + sizeof(unsigned long long));
     st->arr = arr;
     st->iter = 0;
-   // st->arr[st->length] = kanareika;
+    st->status = Successfully;
+   //st->arr[st->length] = kanareika;
     return st;
 }
 
@@ -44,19 +45,19 @@ char* getTime(){
     return rez;
 }
 
-void make_dump(stack* stack){
+exceptions make_dump(stack* stack){
     FILE *file = fopen("files/log.txt", "w");
     //checking is the file opened
     if (file == NULL) {
         printf("File was not opened");
-        return;
+        return Openning_file_error;
     }
     // getting info about running prcecc
     char *string = getTime();
     // print info about stack
     fprintf(file, "Information about stack ");
     fprintf(file, "%s\n", string);
-    fprintf(file, "length = %d\n", stack->length); 
+    fprintf(file, "length = %lu\n", stack->length); 
     fprintf(file, "the current iterator = %d\n", stack->iter);
     fprintf(file, "The memory of array = %p\n", stack->arr);
     fprintf(file, "Elements of array:\n");
@@ -68,7 +69,7 @@ void make_dump(stack* stack){
     fprintf(file, "kanareika value = %d\n", kanareika);
     free(string);
     fclose(file);
-    return;
+    return Successfully;
 }
 
 void make_log(stack* stack){
@@ -106,7 +107,8 @@ void resize_up(stack* stack){
 
 void resize_down(stack* stack){
     if (stack == NULL) {
-        //printf("the stack ponter is NULL");
+        stack->status = Empty_stack;
+        assert(stack->status = Empty_stack);
         return;
     }
     stack->length = (stack->length)/2;
@@ -138,7 +140,7 @@ void push(stack* stack, double info){
     stack->iter++;
     if(stack_verify(stack) == Out_of_range){
         // make dump
-        make_dump(stack);
+        assert(make_dump(stack) != Successfully);
         return;
     }
     
@@ -163,7 +165,7 @@ double pop(stack* stack){
     double tmp = stack->arr[stack->iter--];
     if(stack_verify(stack) == Out_of_range){
         // code
-        make_dump(stack);
+        assert(make_dump(stack) != Successfully);
         return 0;
     }
     return tmp;
@@ -207,14 +209,12 @@ void stack_destroy(stack* stack){
  * @param stack 
  * @return exceptions 
  */
+
 exceptions stack_verify(stack* stack){
     if (stack == NULL) {
         //printf("the stack ponter is NULL");
         return Empty_stack;
     }
-    if (stack->arr[stack->length] != kanareika)
-    {
-        return Out_of_range;
-    }
+    if (stack->arr[stack->length] != kanareika) { return Out_of_range; }
     return Successfully;
 }

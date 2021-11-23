@@ -17,19 +17,21 @@
 #include <assert.h>
 #include <string.h>
 
+// error codes
+typedef enum{
+    Successfully = 0,
+    Out_of_range,
+    Empty_stack,
+    Openning_file_error
+} exceptions;
 // stack
 typedef struct {
     double *arr;
     size_t length;
     int iter;
     double hash;
+    exceptions status;
 } stack;
-// error codes
-typedef enum{
-    Successfully = 0,
-    Out_of_range,
-    Empty_stack
-} exceptions;
 
 
 stack* stack_init();
@@ -42,5 +44,6 @@ double top(stack* stack);
 exceptions stack_verify(stack* stack);
 void make_log(stack* stack);
 char* getTime();
-void make_dump(stack* stack);
+exceptions make_dump(stack* stack);
+
 #endif
