@@ -11,11 +11,14 @@
 
 #ifndef TEST_H
 #define TEST_H
-
+#include"../stack.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
+
 #define print_warning printf("Warning in function %s:%d\n", __FUNCTION__ ,__LINE__);
+
 typedef enum{
     OK,
     ERROR

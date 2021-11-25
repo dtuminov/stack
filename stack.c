@@ -26,14 +26,15 @@ stack* stack_init(){
     st->arr = arr;
     st->iter = 0;
     st->status = Successfully;
-   //st->arr[st->length] = kanareika;
+    st->arr[st->length] = kanareika;
     return st;
 }
 
 /**
+ * @fn char* getTime()
  * @brief Get the Time object
  * 
- * @return char* 
+ * @return char* , current time
  */
 
 char* getTime(){
@@ -44,6 +45,14 @@ char* getTime(){
     char* rez = strdup(string);
     return rez;
 }
+
+/**
+ * @fn exceptions make_dump(stack* stack)
+ * @brief make a dumo of current status of stack
+ * 
+ * @param stack the stack passed to the function
+ * @return exceptions , code of error
+ */
 
 exceptions make_dump(stack* stack){
     FILE *file = fopen("files/log.txt", "w");
@@ -67,13 +76,11 @@ exceptions make_dump(stack* stack){
         fprintf(file, "arr[%i] = %lf\n", i, stack->arr[i]);
     }
     fprintf(file, "kanareika value = %d\n", kanareika);
+    // cleaning memory
     free(string);
+    //closing file
     fclose(file);
     return Successfully;
-}
-
-void make_log(stack* stack){
-    return;
 }
 
 /**
@@ -85,15 +92,18 @@ void make_log(stack* stack){
 
 void resize_up(stack* stack){
     if (stack == NULL) {
+        // make a solution of problem of error
         //printf("the stack ponter is NULL");
         return;
     }
     stack->length = 2 * stack->length;
     double* new_arr = (double*) calloc(sizeof(double), stack->length);
+    //overwriting array
     for (size_t i = 0; i < stack->length/2; i++) {
         new_arr[i] = stack->arr[i];
     }
     free(stack->arr);
+    new_arr[stack->length] = kanareika;
     stack->arr = new_arr;
     return;
 }
@@ -107,16 +117,20 @@ void resize_up(stack* stack){
 
 void resize_down(stack* stack){
     if (stack == NULL) {
+        //make a normal solution of this problem
         stack->status = Empty_stack;
         assert(stack->status = Empty_stack);
         return;
     }
     stack->length = (stack->length)/2;
     double* new_arr = (double*) calloc(sizeof(double), stack->length);
+    // overwriting array
     for (size_t i = 0; i < stack->length; i++) {
         new_arr[i] = stack->arr[i];
     }
     free(stack->arr);
+    //maby dangerous moment
+    new_arr[stack->length] = kanareika;
     stack->arr = new_arr;
     return;
 }
@@ -130,6 +144,7 @@ void resize_down(stack* stack){
 
 void push(stack* stack, double info){
     if (stack == NULL) {
+        // solution
         //printf("the stack ponter is NULL");
         return;
     }
@@ -140,6 +155,7 @@ void push(stack* stack, double info){
     stack->iter++;
     if(stack_verify(stack) == Out_of_range){
         // make dump
+        // ................. normal obrabotshic
         assert(make_dump(stack) != Successfully);
         return;
     }
@@ -156,6 +172,7 @@ void push(stack* stack, double info){
 
 double pop(stack* stack){
     if (stack == NULL) {
+        //solution
         //printf("the stack ponter is NULL");
         return 0;
     }
@@ -172,14 +189,16 @@ double pop(stack* stack){
 }
 
 /**
- * @brief 
+ * @fn double top(stack* stack)
+ * @brief get the last element of stack 
  * 
- * @param stack 
- * @return double 
+ * @param stack the stack passed to the function
+ * @return double, last element of stack
  */
 
 double top(stack* stack){
     if (stack == NULL) {
+        //solution
         //printf("the stack ponter is NULL");
         return 0;
     }
@@ -195,6 +214,7 @@ double top(stack* stack){
 
 void stack_destroy(stack* stack){
     if (stack == NULL) {
+        //solution
         //printf("the stack ponter is NULL");
         return;
     }
@@ -204,7 +224,8 @@ void stack_destroy(stack* stack){
 }
 
 /**
- * @brief  
+ * @fn exceptions stack_verify(stack* stack)
+ * @brief  checking if user try to use wrong(last+1) elemet of array
  * 
  * @param stack 
  * @return exceptions 
@@ -212,6 +233,7 @@ void stack_destroy(stack* stack){
 
 exceptions stack_verify(stack* stack){
     if (stack == NULL) {
+        //solution
         //printf("the stack ponter is NULL");
         return Empty_stack;
     }

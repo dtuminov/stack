@@ -17,6 +17,7 @@
 #include <assert.h>
 #include <string.h>
 
+
 // error codes
 typedef enum{
     Successfully = 0,
@@ -33,7 +34,7 @@ typedef struct {
     exceptions status;
 } stack;
 
-
+//funcs
 stack* stack_init();
 double pop(stack* stack);
 void push(stack* stack, double info);
@@ -42,7 +43,6 @@ void stack_destroy(stack* stack);
 void resize_down(stack* stack);
 double top(stack* stack);
 exceptions stack_verify(stack* stack);
-void make_log(stack* stack);
 char* getTime();
 exceptions make_dump(stack* stack);
 
