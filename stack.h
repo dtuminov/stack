@@ -18,14 +18,23 @@
 #include <string.h>
 
 
-// error codes
+/**
+ * @brief error codes
+ * 
+ */
+
 typedef enum{
     Successfully = 0,
     Out_of_range,
     Empty_stack,
     Openning_file_error
 } exceptions;
-// stack
+
+/**
+ * @brief stack
+ * 
+ */
+
 typedef struct {
     double *arr;
     size_t length;

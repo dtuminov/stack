@@ -2,7 +2,7 @@
  * @file stack.c
  * @author tuminov dmitriy (you@domain.com)
  * @brief 
- * @version 0.1
+ * @version 0.2
  * @date 2021-11-20
  * 
  * @copyright Copyright (c) 2021
@@ -55,6 +55,10 @@ char* getTime(){
  */
 
 exceptions make_dump(stack* stack){
+    if (stack == NULL) {
+        stack->status = Empty_stack;
+        assert(stack->status == Empty_stack);
+    }
     FILE *file = fopen("files/log.txt", "w");
     //checking is the file opened
     if (file == NULL) {
@@ -92,9 +96,8 @@ exceptions make_dump(stack* stack){
 
 void resize_up(stack* stack){
     if (stack == NULL) {
-        // make a solution of problem of error
-        //printf("the stack ponter is NULL");
-        return;
+        stack->status = Empty_stack;
+        assert(stack->status == Empty_stack);
     }
     stack->length = 2 * stack->length;
     double* new_arr = (double*) calloc(sizeof(double), stack->length);
@@ -103,6 +106,7 @@ void resize_up(stack* stack){
         new_arr[i] = stack->arr[i];
     }
     free(stack->arr);
+    //add kanareika
     new_arr[stack->length] = kanareika;
     stack->arr = new_arr;
     return;
@@ -117,9 +121,8 @@ void resize_up(stack* stack){
 
 void resize_down(stack* stack){
     if (stack == NULL) {
-        //make a normal solution of this problem
         stack->status = Empty_stack;
-        assert(stack->status = Empty_stack);
+        assert(stack->status == Empty_stack);
         return;
     }
     stack->length = (stack->length)/2;
@@ -144,8 +147,8 @@ void resize_down(stack* stack){
 
 void push(stack* stack, double info){
     if (stack == NULL) {
-        // solution
-        //printf("the stack ponter is NULL");
+        stack->status = Empty_stack;
+        assert(stack->status == Empty_stack);
         return;
     }
     if(stack->iter >= stack->length-1) {
@@ -153,13 +156,10 @@ void push(stack* stack, double info){
     }
     stack->arr[stack->iter] = info;
     stack->iter++;
-    if(stack_verify(stack) == Out_of_range){
-        // make dump
-        // ................. normal obrabotshic
+    if(stack_verify(stack) == Out_of_range)  {
         assert(make_dump(stack) != Successfully);
         return;
     }
-    
     return;
 }
 
@@ -172,10 +172,13 @@ void push(stack* stack, double info){
 
 double pop(stack* stack){
     if (stack == NULL) {
-        //solution
-        //printf("the stack ponter is NULL");
+        stack->status = Empty_stack;
+        assert(stack->status == Empty_stack);
         return 0;
     }
+    //checking if inter < 0
+    if ((stack->iter-1) < 0) { return 0; }
+    //main part of pop()
     if (stack->iter <=stack->length/2) {
         resize_down(stack);
     }
@@ -198,8 +201,8 @@ double pop(stack* stack){
 
 double top(stack* stack){
     if (stack == NULL) {
-        //solution
-        //printf("the stack ponter is NULL");
+        stack->status = Empty_stack;
+        assert(stack->status == Empty_stack);
         return 0;
     }
     return stack->arr[stack->iter-1];;
@@ -214,8 +217,8 @@ double top(stack* stack){
 
 void stack_destroy(stack* stack){
     if (stack == NULL) {
-        //solution
-        //printf("the stack ponter is NULL");
+        stack->status = Empty_stack;
+        assert(stack->status == Empty_stack);
         return;
     }
     free(stack->arr);
@@ -233,9 +236,8 @@ void stack_destroy(stack* stack){
 
 exceptions stack_verify(stack* stack){
     if (stack == NULL) {
-        //solution
-        //printf("the stack ponter is NULL");
-        return Empty_stack;
+        stack->status = Empty_stack;
+        assert(stack->status == Empty_stack);
     }
     if (stack->arr[stack->length] != kanareika) { return Out_of_range; }
     return Successfully;
