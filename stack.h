@@ -24,22 +24,27 @@
  */
 
 typedef enum{
+    //functions
     Successfully = 0,
+    Crashed,
+    //stack status
     Out_of_range,
     Empty_stack,
-    Openning_file_error
+    Openning_file_error,
+    Different_hash
 } exceptions;
+
 
 /**
  * @brief stack
- * 
+ *  
  */
 
 typedef struct {
     double *arr;
     size_t length;
     int iter;
-    double hash;
+    int hash;
     exceptions status;
 } stack;
 
@@ -54,5 +59,8 @@ double top(stack* stack);
 exceptions stack_verify(stack* stack);
 char* getTime();
 exceptions make_dump(stack* stack);
-
+///////
+int make_hash(double* array);
+exceptions hash_verify(stack* stack);
+exceptions kanareika_verify(stack* stack);
 #endif
