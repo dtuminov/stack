@@ -1,13 +1,14 @@
 /**
  * @file stack.h
- * @author your name (you@domain.com)
+ * @author tuminov dmitriy (you@domain.com)
  * @brief 
- * @version 0.1
+ * @version 0.2
  * @date 2021-11-20
  * 
  * @copyright Copyright (c) 2021
  * 
  */
+
 #ifndef STACK_H
 #define STACK_H
 
@@ -17,12 +18,14 @@
 #include <assert.h>
 #include <string.h>
 
+extern const unsigned long long kanareika;
+extern const char* exceptions_array[];
 
+typedef double elem_t;
 /**
  * @brief error codes
  * 
  */
-
 typedef enum{
     //functions
     Successfully = 0,
@@ -33,15 +36,12 @@ typedef enum{
     Openning_file_error,
     Different_hash
 } exceptions;
-
-
 /**
  * @brief stack
  *  
  */
-
 typedef struct {
-    double *arr;
+    elem_t *arr;
     size_t length;
     int iter;
     int hash;
@@ -50,16 +50,16 @@ typedef struct {
 
 //funcs
 stack* stack_init();
-double pop(stack* stack);
+//stack* stack_init(<type>);
+exceptions stack_verify(stack* stack);
+elem_t pop(stack* stack);
 void push(stack* stack, double info);
 void resize_up(stack* stack);
 void stack_destroy(stack* stack);
 void resize_down(stack* stack);
-double top(stack* stack);
-exceptions stack_verify(stack* stack);
+elem_t top(stack* stack);
 char* getTime();
 exceptions make_dump(stack* stack);
-///////
 int make_hash(double* array);
 exceptions hash_verify(stack* stack);
 exceptions kanareika_verify(stack* stack);

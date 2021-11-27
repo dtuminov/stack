@@ -2,16 +2,16 @@
  * @file stack.c
  * @author tuminov dmitriy (you@domain.com)
  * @brief 
- * @version 0.2
+ * @version 0.3
  * @date 2021-11-20
  * 
  * @copyright Copyright (c) 2021
  * 
  */
 #include "stack.h"
-const unsigned long long kanareika = 7956576;
+
+const unsigned long long kanareika = 79564576;
 const char* exceptions_array[] = {"SUCCESSFULLY", "CRASHED", "OUT_OF_RANGE","EMPTY_STACK","OPENNING_FILE_ERROR","DIFFERENT_HASH"};
-exceptions stack_verify(stack* stack);
 
 //local funcs
 /**
@@ -41,11 +41,11 @@ char* getTime(){
 stack* stack_init(){
     stack *st = (stack*)calloc(sizeof(stack), 1);
     st->length = 10;
-    double *arr = (double*) calloc(sizeof(double), st->length + sizeof(unsigned long long));
+    elem_t *arr = (elem_t*) calloc(sizeof(elem_t), st->length + sizeof(unsigned long long));
     st->arr = arr;
     st->iter = 0;
     st->status = Successfully;
-    //st->arr[st->length] = kanareika;
+    st->arr[st->length-1] = kanareika;
     return st;
 }
 
@@ -62,14 +62,12 @@ void resize_up(stack* stack){
         assert(stack->status == Empty_stack);
     }
     stack->length = 2 * stack->length;
-    double* new_arr = (double*) calloc(sizeof(double), stack->length);
+    elem_t* new_arr = (elem_t*) calloc(sizeof(elem_t), stack->length);
     //overwriting array
-    for (size_t i = 0; i < stack->length/2; i++) {
-        new_arr[i] = stack->arr[i];
-    }
+    memcpy(new_arr, stack->arr,stack->length*sizeof(elem_t));
     free(stack->arr);
     //add kanareika
-    new_arr[stack->length] = kanareika;
+    new_arr[stack->length-1] = kanareika;
     stack->arr = new_arr;
     return;
 }
@@ -80,7 +78,7 @@ void resize_up(stack* stack){
  * @details the function reduces the length of the stack array by half
  * @param stack the stack passed to the function
  */
-
+//to realize the realloc functonal
 void resize_down(stack* stack){
     if (stack == NULL) {
         stack->status = Empty_stack;
@@ -88,14 +86,13 @@ void resize_down(stack* stack){
         return;
     }
     stack->length = (stack->length)/2;
-    double* new_arr = (double*) calloc(sizeof(double), stack->length);
+    //realloc !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    elem_t* new_arr = (elem_t*) calloc(sizeof(elem_t), stack->length);
     // overwriting array
-    for (size_t i = 0; i < stack->length; i++) {
-        new_arr[i] = stack->arr[i];
-    }
+    memcpy(new_arr, stack->arr,stack->length*sizeof(elem_t));
     free(stack->arr);
     //maby dangerous moment
-    new_arr[stack->length] = kanareika;
+    new_arr[stack->length-1] = kanareika;
     stack->arr = new_arr;
     return;
 }
@@ -107,15 +104,16 @@ void resize_down(stack* stack){
  * @param info data that is being moved to the array
  */
 
-void push(stack* stack, double info){
+void push(stack* stack, elem_t info){
     if (stack == NULL) {
         stack->status = Empty_stack;
         assert(stack->status == Empty_stack);
         return;
     }
-    if(stack->iter >= stack->length-1) {
+    if(stack->iter >= stack->length-2) {
         resize_up(stack);
     }
+    //printf("push iter = %d, info = %lf\n\n", stack->iter, info);
     stack->arr[stack->iter] = info;
     stack->iter++;
     stack_verify(stack);
@@ -123,38 +121,38 @@ void push(stack* stack, double info){
 }
 
 /**
- * @fn double pop(stack* stack)
+ * @fn elem_t pop(stack* stack)
  * @brief the function removes the last element of the stack
  * @param stack the stack passed to the function
  * @return the value that was deleted
  */
 
-double pop(stack* stack){
+elem_t pop(stack* stack){
     if (stack == NULL) {
         stack->status = Empty_stack;
         assert(stack->status == Empty_stack);
         return 0;
     }
     //checking if inter < 0
-    if ((stack->iter-1) < 0) { return 0; }
+    if ((stack->iter-2) < 0) { return 0; }
     //main part of pop()
-    if (stack->iter <=stack->length/2) {
+    if (stack->iter <= stack->length/3) {
         resize_down(stack);
     }
-    double tmp = stack->arr[stack->iter--];
+    elem_t tmp = stack->arr[stack->iter--];
     stack_verify(stack);
     return tmp;
 }
 
 /**
- * @fn double top(stack* stack)
+ * @fn elem_t top(stack* stack)
  * @brief get the last element of stack 
  * 
  * @param stack the stack passed to the function
  * @return double, last element of stack
  */
 
-double top(stack* stack){
+elem_t top(stack* stack){
     if (stack == NULL) {
         stack->status = Empty_stack;
         assert(stack->status == Empty_stack);
@@ -181,6 +179,7 @@ void stack_destroy(stack* stack){
     return;
 }
 
+// to do this function!!
 int make_hash(double* array){
     //make hash
     return 0;
@@ -201,7 +200,7 @@ exceptions make_dump(stack* stack){
         stack->status = Empty_stack;
         assert(stack->status == Empty_stack);
     }
-    FILE *file = fopen("files/log.txt", "w");
+    FILE *file = fopen("files/log.txt", "a");
     //checking is the file opened
     if (file == NULL) {
         printf("File was not opened");
@@ -226,6 +225,7 @@ exceptions make_dump(stack* stack){
     fprintf(file, "original stack hash value = %d\n", stack->hash);
     fprintf(file, "current stack hash value = %d\n", stack->hash);
     fprintf(file, "stack status = %s\n", exceptions_array[stack->status]);
+    fprintf(file, "procces ended\n\n\n");
     // cleaning memory
     free(string);
     //closing file
@@ -234,14 +234,15 @@ exceptions make_dump(stack* stack){
 }
 
 /**
- * @brief 
+ * @fn exceptions kanareika_verify(stack* stack)
+ * @brief checking OUT_OF_RANGE situation
  * 
- * @param stack 
- * @return exceptions 
+ * @param stack the stack passed to the functio
+ * @return exceptions exceptions , code of error
  */
 
 exceptions kanareika_verify(stack* stack){
-    if (stack->arr[stack->length] != kanareika) { 
+    if (stack->arr[stack->length-1] != kanareika) { 
         stack->status = Out_of_range; 
         return Out_of_range; 
     }
@@ -249,10 +250,11 @@ exceptions kanareika_verify(stack* stack){
 }
 
 /**
- * @brief 
+ * @fn exceptions hash_verify(stack* stack)
+ * @brief compared hash of array
  * 
- * @param stack 
- * @return exceptions 
+ * @param stack the stack passed to the functio
+ * @return exceptions exceptions , code of error
  */
 
 exceptions hash_verify(stack* stack){
@@ -282,11 +284,3 @@ exceptions stack_verify(stack* stack){
     }
     return Successfully;
 }
-
-
-////========================================================================
-//hash 
-  
-
-
-//fix ststus in all func
