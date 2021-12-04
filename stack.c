@@ -62,13 +62,13 @@ void resize_up(stack* stack){
         assert(stack->status == Empty_stack);
     }
     stack->length = 2 * stack->length;
-    elem_t* new_arr = (elem_t*) calloc(sizeof(elem_t), stack->length);
+    stack->arr = (elem_t*) realloc(stack->arr, stack->length*sizeof(elem_t));
     //overwriting array
-    memcpy(new_arr, stack->arr,stack->length*sizeof(elem_t));
-    free(stack->arr);
+    //memcpy(new_arr, stack->arr,stack->length*sizeof(elem_t));
+    //free(stack->arr);
     //add kanareika
-    new_arr[stack->length-1] = kanareika;
-    stack->arr = new_arr;
+    stack->arr[stack->length-1] = kanareika;
+   // stack->arr = new_arr;
     return;
 }
 
@@ -86,14 +86,8 @@ void resize_down(stack* stack){
         return;
     }
     stack->length = (stack->length)/2;
-    //realloc !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    elem_t* new_arr = (elem_t*) calloc(sizeof(elem_t), stack->length);
-    // overwriting array
-    memcpy(new_arr, stack->arr,stack->length*sizeof(elem_t));
-    free(stack->arr);
-    //maby dangerous moment
-    new_arr[stack->length-1] = kanareika;
-    stack->arr = new_arr;
+    stack->arr = (elem_t*) realloc(stack->arr, stack->length*sizeof(elem_t));
+    stack->arr[stack->length-1] = kanareika;
     return;
 }
 
@@ -116,6 +110,7 @@ void push(stack* stack, elem_t info){
     //printf("push iter = %d, info = %lf\n\n", stack->iter, info);
     stack->arr[stack->iter] = info;
     stack->iter++;
+    make_hash(stack->arr);
     stack_verify(stack);
     return;
 }
@@ -140,6 +135,7 @@ elem_t pop(stack* stack){
         resize_down(stack);
     }
     elem_t tmp = stack->arr[stack->iter--];
+    make_hash(stack->arr);
     stack_verify(stack);
     return tmp;
 }
@@ -179,10 +175,12 @@ void stack_destroy(stack* stack){
     return;
 }
 
-// to do this function!!
-int make_hash(double* array){
-    //make hash
-    return 0;
+// for the first time
+int make_hash(elem_t* array){
+    size_t hash = 1;
+    for (size_t i = 0; i < sizeof(array)/sizeof(elem_t); i++)
+        hash *= i;
+    return hash;
 }
 
 //exceptions part
@@ -262,6 +260,10 @@ exceptions hash_verify(stack* stack){
         stack->status = Different_hash;
         return Different_hash;
     }
+    if (stack->hash != make_hash(stack->arr)) {
+        stack->status = Different_hash;  
+        return Different_hash;
+    }
     return Successfully;
 }
 
@@ -278,7 +280,7 @@ exceptions stack_verify(stack* stack){
         stack->status = Empty_stack;
         assert(stack->status == Empty_stack);
     }
-    if (hash_verify(stack) != Successfully || kanareika_verify(stack) != Successfully) {
+    if (stack->status != Successfully) {
         make_dump(stack);
         return Crashed;
     }

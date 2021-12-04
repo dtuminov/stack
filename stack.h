@@ -50,17 +50,16 @@ typedef struct {
 
 //funcs
 stack* stack_init();
-//stack* stack_init(<type>);
 exceptions stack_verify(stack* stack);
 elem_t pop(stack* stack);
-void push(stack* stack, double info);
+void push(stack* stack, elem_t info);
 void resize_up(stack* stack);
 void stack_destroy(stack* stack);
 void resize_down(stack* stack);
 elem_t top(stack* stack);
 char* getTime();
 exceptions make_dump(stack* stack);
-int make_hash(double* array);
+int make_hash(elem_t* array);
 exceptions hash_verify(stack* stack);
 exceptions kanareika_verify(stack* stack);
 #endif

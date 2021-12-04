@@ -20,13 +20,35 @@ int run_all_tests(){
     assert(test_top() == OK);
     assert(test_resizeUp() == OK);
     assert(test_resizeDown() == OK);
+    assert(test_kanareika_verify() == OK);
     printf("======All functions tested successfully======\n");
     return 0;
 }
 
 ERRORS test_push(){
     printf("[%s]:",__FUNCTION__);
-
+    stack* stack = stack_init();
+    //test 1
+    for (size_t i = 0; i < 5; i++)
+        push(stack, i); 
+    if (stack->arr[stack->iter] == top(stack))
+    {
+        print_warning;
+        return ERROR;
+    }
+    
+    stack_destroy(stack);
+    stack = stack_init();
+    //test 2
+    for (size_t i = 0; i < 41; i++)
+        push(stack, i); 
+    if (stack->arr[stack->iter] == top(stack))
+    {
+        print_warning;
+        return ERROR;
+    }
+    
+    stack_destroy(stack);
     printf("OK\n");
     return OK;
 }
@@ -95,6 +117,8 @@ ERRORS test_resizeDown(){
         print_warning;
         return ERROR;
     }
+    stack_destroy(stack);
+    stack = stack_init();
     //test 2
     for (size_t i = 0; i < 5; i++)
     {
@@ -106,5 +130,28 @@ ERRORS test_resizeDown(){
     }
     stack_destroy(stack);
     printf("OK\n");
+    return OK;
+}
+
+ERRORS test_kanareika_verify(){
+    printf("[%s]:",__FUNCTION__);
+    stack* stack = stack_init();
+    for (size_t i = 0; i < 10; i++)
+    {
+        push(stack, 10);
+    }
+    if (stack->arr[stack->length - 1] != kanareika)
+    {
+        print_warning;
+        return ERROR;
+    }
+    
+    stack_destroy(stack);
+    printf("OK\n");
+    return OK;
+}
+
+ERRORS test_hash_verify(){
+    printf("[%s]:",__FUNCTION__);
     return OK;
 }
