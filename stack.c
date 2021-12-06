@@ -8,10 +8,12 @@
  * @copyright Copyright (c) 2021
  * 
  */
+
 #include "stack.h"
 
 const unsigned long long kanareika = 79564576;
 const char* exceptions_array[] = {"SUCCESSFULLY", "CRASHED", "OUT_OF_RANGE","EMPTY_STACK","OPENNING_FILE_ERROR","DIFFERENT_HASH"};
+const int seed = 5;
 
 //local funcs
 /**
@@ -50,69 +52,57 @@ stack* stack_init(){
 }
 
 /**
- * @fn void resize_up(stack* stack)
+ * @fn exceptions resize_up(stack* stack)
  * @brief increases the length of the array
  * @details doubles the length of the stack array
  * @param stack the stack passed to the function
  */
 
-void resize_up(stack* stack){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-    }
+exceptions resize_up(stack* stack){
+    if (stack == NULL)
+        return Empty_stack;
     stack->length = 2 * stack->length;
     stack->arr = (elem_t*) realloc(stack->arr, stack->length*sizeof(elem_t));
-    //overwriting array
-    //memcpy(new_arr, stack->arr,stack->length*sizeof(elem_t));
-    //free(stack->arr);
-    //add kanareika
     stack->arr[stack->length-1] = kanareika;
-   // stack->arr = new_arr;
-    return;
+    return Successfully;
 }
 
 /**
- * @fn void resize_down(stack* stack)
+ * @fn exceptions resize_down(stack* stack)
  * @brief void resize_down(stack* stack)
  * @details the function reduces the length of the stack array by half
  * @param stack the stack passed to the function
  */
 //to realize the realloc functonal
-void resize_down(stack* stack){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-        return;
-    }
+exceptions resize_down(stack* stack){
+    if (stack == NULL)
+        return Empty_stack;
     stack->length = (stack->length)/2;
     stack->arr = (elem_t*) realloc(stack->arr, stack->length*sizeof(elem_t));
     stack->arr[stack->length-1] = kanareika;
-    return;
+    return Successfully;
 }
 
 /**
- * @fn void push(stack* stack, double info)
+ * @fn exceptions push(stack* stack, double info)
  * @brief adds an element to the array
  * @param stack the stack passed to the function
  * @param info data that is being moved to the array
  */
 
-void push(stack* stack, elem_t info){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-        return;
-    }
-    if(stack->iter >= stack->length-2) {
+exceptions push(stack* stack, elem_t info){
+    if (stack == NULL)
+        return Empty_stack;
+    if (stack->iter>0)
+       stack_verify(stack);
+    if(stack->iter >= stack->length-2) 
         resize_up(stack);
-    }
-    //printf("push iter = %d, info = %lf\n\n", stack->iter, info);
     stack->arr[stack->iter] = info;
     stack->iter++;
-    make_hash(stack->arr);
+    //making hash
+    stack->hash = murmur3_32((uint8_t*)stack->arr, stack->length, seed);
     stack_verify(stack);
-    return;
+    return Successfully;
 }
 
 /**
@@ -123,19 +113,18 @@ void push(stack* stack, elem_t info){
  */
 
 elem_t pop(stack* stack){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-        return 0;
-    }
+    if (stack == NULL)
+        return Empty_stack;
+    if (stack->iter>0)
+        stack_verify(stack);
     //checking if inter < 0
-    if ((stack->iter-2) < 0) { return 0; }
+    if ((stack->iter-2) < 0) 
+        return 0; 
     //main part of pop()
-    if (stack->iter <= stack->length/3) {
+    if (stack->iter <= stack->length/3)
         resize_down(stack);
-    }
     elem_t tmp = stack->arr[stack->iter--];
-    make_hash(stack->arr);
+    stack->hash = murmur3_32((uint8_t*)stack->arr, stack->length, seed);
     stack_verify(stack);
     return tmp;
 }
@@ -149,40 +138,25 @@ elem_t pop(stack* stack){
  */
 
 elem_t top(stack* stack){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-        return 0;
-    }
+    if (stack == NULL)
+        return Empty_stack;
     return stack->arr[stack->iter-1];;
 }
 
 /**
- * @fn void stack_destroy(stack* stack)
+ * @fn exceptions stack_destroy(stack* stack)
  * @brief the function cleans the stack passed to it
  * 
  * @param stack the stack passed to the function
  */
 
-void stack_destroy(stack* stack){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-        return;
-    }
+exceptions stack_destroy(stack* stack){
+    if (stack == NULL)
+        return Empty_stack;
     free(stack->arr);
     free(stack);
-    return;
+    return Successfully;
 }
-
-// for the first time
-int make_hash(elem_t* array){
-    size_t hash = 1;
-    for (size_t i = 0; i < sizeof(array)/sizeof(elem_t); i++)
-        hash *= i;
-    return hash;
-}
-
 //exceptions part
 
 /**
@@ -194,10 +168,8 @@ int make_hash(elem_t* array){
  */
 
 exceptions make_dump(stack* stack){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-    }
+    if (stack == NULL)
+        return Empty_stack;
     FILE *file = fopen("files/log.txt", "a");
     //checking is the file opened
     if (file == NULL) {
@@ -207,7 +179,7 @@ exceptions make_dump(stack* stack){
     // getting info about running prcecc
     char *string = getTime();
     // print info about stack
-    fprintf(file, "Information about stack ");
+    fprintf(file, "................................\nInformation about stack ");
     fprintf(file, "%s\n", string);
     fprintf(file, "length = %lu\n", stack->length); 
     fprintf(file, "the current iterator = %d\n", stack->iter);
@@ -221,9 +193,9 @@ exceptions make_dump(stack* stack){
     //values
     fprintf(file, "kanareika value = %d\n", kanareika);
     fprintf(file, "original stack hash value = %d\n", stack->hash);
-    fprintf(file, "current stack hash value = %d\n", stack->hash);
+    fprintf(file, "current stack hash value = %d\n", murmur3_32((uint8_t*)stack->arr, stack->length, seed));
     fprintf(file, "stack status = %s\n", exceptions_array[stack->status]);
-    fprintf(file, "procces ended\n\n\n");
+    fprintf(file, "procces ended\n................................\n\n\n\n");
     // cleaning memory
     free(string);
     //closing file
@@ -251,17 +223,13 @@ exceptions kanareika_verify(stack* stack){
  * @fn exceptions hash_verify(stack* stack)
  * @brief compared hash of array
  * 
- * @param stack the stack passed to the functio
+ * @param stack the stack passed to the function
  * @return exceptions exceptions , code of error
  */
 
 exceptions hash_verify(stack* stack){
-    if (stack->hash != make_hash(stack->arr)) {
+    if (stack->hash != murmur3_32((uint8_t*)stack->arr, stack->length, seed)) {
         stack->status = Different_hash;
-        return Different_hash;
-    }
-    if (stack->hash != make_hash(stack->arr)) {
-        stack->status = Different_hash;  
         return Different_hash;
     }
     return Successfully;
@@ -271,7 +239,7 @@ exceptions hash_verify(stack* stack){
  * @fn exceptions stack_verify(stack* stack)
  * @brief  checking if user try to use wrong(last+1) elemet of array
  * 
- * @param stack 
+ * @param stack  the stack passed to the function
  * @return exceptions 
  */
 
@@ -280,9 +248,81 @@ exceptions stack_verify(stack* stack){
         stack->status = Empty_stack;
         assert(stack->status == Empty_stack);
     }
+    kanareika_verify(stack);
+    hash_verify(stack);
     if (stack->status != Successfully) {
         make_dump(stack);
         return Crashed;
     }
     return Successfully;
+}
+
+/**
+ * @brief Get the Length object
+ * @fn int GetLength (stack* stack)
+ * 
+ * @param stack he stack passed to the function
+ * @return int 
+ */
+
+int GetLength (stack* stack){
+    return stack->length-1;
+}
+
+/**
+ * @brief 
+ * @fn 
+ * @param k 
+ * @return uint32_t 
+ */
+
+uint32_t murmur_32_scramble(uint32_t k) {
+    k *= 0xcc9e2d51;
+    k = (k << 15) | (k >> 17);
+    k *= 0x1b873593;
+    return k;
+}
+
+/**
+ * @fn
+ * @brief 
+ * 
+ * @param key 
+ * @param len 
+ * @param seed 
+ * @return uint32_t 
+ */
+
+uint32_t murmur3_32(const uint8_t* key, size_t len, uint32_t seed)
+{
+	uint32_t h = seed;
+    uint32_t k;
+    /* Read in groups of 4. */
+    for (size_t i = len >> 2; i; i--) {
+        // Here is a source of differing results across endiannesses.
+        // A swap here has no effects on hash properties though.
+        memcpy(&k, key, sizeof(uint32_t));
+        key += sizeof(uint32_t);
+        h ^= murmur_32_scramble(k);
+        h = (h << 13) | (h >> 19);
+        h = h * 5 + 0xe6546b64;
+    }
+    /* Read the rest. */
+    k = 0;
+    for (size_t i = len & 3; i; i--) {
+        k <<= 8;
+        k |= key[i - 1];
+    }
+    // A swap is *not* necessary here because the preceding loop already
+    // places the low bytes in the low places according to whatever endianness
+    // we use. Swaps only apply when the memory is copied in a chunk.
+    h ^= murmur_32_scramble(k);
+    /* Finalize. */
+	h ^= len;
+	h ^= h >> 16;
+	h *= 0x85ebca6b;
+	h ^= h >> 13;
+	h *= 0xc2b2ae35;
+	h ^= h >> 16;
+	return h;
 }

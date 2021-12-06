@@ -17,9 +17,11 @@
 #include <time.h>
 #include <assert.h>
 #include <string.h>
+#include <stdint.h>
 
 extern const unsigned long long kanareika;
 extern const char* exceptions_array[];
+const int seed;
 
 typedef double elem_t;
 /**
@@ -44,7 +46,7 @@ typedef struct {
     elem_t *arr;
     size_t length;
     int iter;
-    int hash;
+    uint32_t hash;
     exceptions status;
 } stack;
 
@@ -52,14 +54,16 @@ typedef struct {
 stack* stack_init();
 exceptions stack_verify(stack* stack);
 elem_t pop(stack* stack);
-void push(stack* stack, elem_t info);
-void resize_up(stack* stack);
-void stack_destroy(stack* stack);
-void resize_down(stack* stack);
+exceptions push(stack* stack, elem_t info);
+exceptions resize_up(stack* stack);
+exceptions stack_destroy(stack* stack);
+exceptions resize_down(stack* stack);
 elem_t top(stack* stack);
 char* getTime();
 exceptions make_dump(stack* stack);
-int make_hash(elem_t* array);
 exceptions hash_verify(stack* stack);
 exceptions kanareika_verify(stack* stack);
+int GetLength (stack* stack);
+uint32_t murmur_32_scramble(uint32_t k);
+uint32_t murmur3_32(const uint8_t* key, size_t len, uint32_t seed);
 #endif
