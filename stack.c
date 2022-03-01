@@ -244,10 +244,8 @@ exceptions hash_verify(stack* stack){
  */
 
 exceptions stack_verify(stack* stack){
-    if (stack == NULL) {
-        stack->status = Empty_stack;
-        assert(stack->status == Empty_stack);
-    }
+    if (stack == NULL)
+        return Empty_stack;
     kanareika_verify(stack);
     hash_verify(stack);
     if (stack->status != Successfully) {
@@ -270,8 +268,8 @@ int GetLength (stack* stack){
 }
 
 /**
- * @brief 
- * @fn 
+ * @brief the scramble for hash function 
+ * @fn uint32_t murmur_32_scramble(uint32_t k)
  * @param k 
  * @return uint32_t 
  */
@@ -284,8 +282,8 @@ uint32_t murmur_32_scramble(uint32_t k) {
 }
 
 /**
- * @fn
- * @brief 
+ * @fn uint32_t murmur3_32(const uint8_t* key, size_t len, uint32_t seed)
+ * @brief making hash 
  * 
  * @param key 
  * @param len 

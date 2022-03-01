@@ -28,5 +28,12 @@ ERRORS test_pop();
 ERRORS test_top();
 ERRORS test_resizeUp();
 ERRORS test_resizeDown();
+ERRORS test_stack_verify();
+ERRORS test_stack_destroy();
+ERRORS test_hash_verify();
+ERRORS test_kanareika_verify();
+ERRORS test_GetLength();
+ERRORS test_make_hash();
 int run_all_tests();
+
 #endif

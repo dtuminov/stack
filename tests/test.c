@@ -21,6 +21,11 @@ int run_all_tests(){
     assert(test_resizeUp() == OK);
     assert(test_resizeDown() == OK);
     assert(test_kanareika_verify() == OK);
+    assert(test_stack_destroy() == OK);
+    assert(test_stack_verify() == OK);
+    assert(test_hash_verify() == OK);
+    assert(test_GetLength() == OK);
+    assert(test_make_hash() == OK);
     printf("======All functions tested successfully======\n");
     return 0;
 }
@@ -153,5 +158,73 @@ ERRORS test_kanareika_verify(){
 
 ERRORS test_hash_verify(){
     printf("[%s]:",__FUNCTION__);
+    printf("OK\n");
+    return OK;
+}
+
+ERRORS test_stack_verify(){
+    printf("[%s]:",__FUNCTION__);
+    stack* stack1 = stack_init();
+    for (size_t i = 0; i < 50; i++)
+    {
+        push(stack1, i);
+    }
+    pop(stack1);
+    stack1->arr[stack1->length-1] = 0;
+    if (stack_verify(stack1) == Successfully)
+    {
+        print_warning;
+        return ERROR;
+    }
+    stack_destroy(stack1);
+    //test2
+    stack *stack2 = stack_init();
+    for (size_t i = 0; i < 50; i++)
+    {
+        push(stack2, i);
+    }
+    pop(stack2);
+    if (stack_verify(stack2) != Successfully) {
+        print_warning;
+        return ERROR;
+    }
+    stack_destroy(stack2);
+    printf("OK\n");
+    return OK;
+}
+
+ERRORS test_stack_destroy(){
+    printf("[%s]:",__FUNCTION__);
+    /*
+    stack * stack = stack_init();
+    push(stack, 8);
+    stack_destroy(stack);
+    printf("%p\n%p\n\n", stack, stack->arr);
+    if (stack->arr != NULL || stack != NULL)
+    {
+        print_warning;
+        return ERROR;
+    }
+    
+    printf("OK\n");
+    */
+    return OK;
+}
+
+ERRORS test_GetLength(){
+    printf("[%s]:",__FUNCTION__);
+    stack* stack = stack_init();
+    if(stack->length != 10){
+        print_warning;
+        return ERROR; 
+    }
+    stack_destroy(stack);
+    printf("OK\n");
+    return OK;
+}
+
+ERRORS test_make_hash(){
+    printf("[%s]:",__FUNCTION__);
+    printf("OK\n");
     return OK;
 }
